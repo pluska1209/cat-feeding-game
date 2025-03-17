@@ -13,23 +13,13 @@ let isGameOver = false;
 let score = 0;
 let timeLeft = 30;
 let currentCanType = 0;
-let canTimeout; // ⏳ 用來控制罐頭自動更換的計時器
+let canTimeout;
 
 const cans = [
-    "https://raw.githubusercontent.com/pluska1209/cat-feeding-game/main/catcan.png",  // 普通罐頭
-    "https://raw.githubusercontent.com/pluska1209/cat-feeding-game/main/goldcan.png", // 金色罐頭
-    "https://raw.githubusercontent.com/pluska1209/cat-feeding-game/main/blackcan.png" // 壞掉的罐頭
+    "https://raw.githubusercontent.com/pluska1209/cat-feeding-game/main/catcan.png",
+    "https://raw.githubusercontent.com/pluska1209/cat-feeding-game/main/goldcan.png",
+    "https://raw.githubusercontent.com/pluska1209/cat-feeding-game/main/blackcan.png"
 ];
-
-// ✅ 強制更換罐頭（3 秒後自動換）
-function forceChangeCan() {
-    clearTimeout(canTimeout); // 🔄 清除舊的計時器
-    canTimeout = setTimeout(() => {
-        if (!isGameOver) {
-            replaceCanImmediately(); // ✅ 強制換新罐頭
-        }
-    }, 3000); // 3 秒後換新罐頭
-}
 
 // ✅ 讓罐頭立即換新
 function replaceCanImmediately() {
@@ -37,7 +27,7 @@ function replaceCanImmediately() {
     setTimeout(() => {
         randomizeCan(); // 立刻換新罐頭
         can.style.opacity = "1"; // 再淡入罐頭
-    }, 200); // 200ms 過渡動畫
+    }, 200);
 }
 
 // ✅ 隨機更換罐頭
@@ -45,7 +35,17 @@ function randomizeCan() {
     if (isGameOver) return;
     currentCanType = Math.floor(Math.random() * cans.length);
     can.src = cans[currentCanType];
-    forceChangeCan(); // ✅ 確保罐頭 3 秒內會自動變更
+    forceChangeCan();
+}
+
+// ✅ 強制更換罐頭（3 秒後自動換）
+function forceChangeCan() {
+    clearTimeout(canTimeout);
+    canTimeout = setTimeout(() => {
+        if (!isGameOver) {
+            replaceCanImmediately();
+        }
+    }, 3000);
 }
 
 // ✅ 計時器
@@ -84,42 +84,48 @@ function endGame() {
 }
 
 // ✅ 罐頭拖曳邏輯
-can.addEventListener('mousedown', () => {
+can.addEventListener('mousedown', (e) => {
     if (isGameOver) return;
     isDragging = true;
+    moveCan(e.clientX, e.clientY);
 });
 
 document.addEventListener('mousemove', (e) => {
     if (isGameOver || !isDragging) return;
-    moveCan(e.clientX, e.clientY);
+    requestAnimationFrame(() => moveCan(e.clientX, e.clientY));
 });
 
 document.addEventListener('mouseup', () => isDragging = false);
 
+// ✅ 觸控支援（手機）
 can.addEventListener('touchstart', (e) => {
     if (isGameOver) return;
     isDragging = true;
+    moveCan(e.touches[0].clientX, e.touches[0].clientY);
     e.preventDefault();
 });
 
 document.addEventListener('touchmove', (e) => {
     if (isGameOver || !isDragging) return;
-    let touch = e.touches[0];
-    moveCan(touch.clientX, touch.clientY);
-});
+    requestAnimationFrame(() => moveCan(e.touches[0].clientX, e.touches[0].clientY));
+}, { passive: false });
 
 document.addEventListener('touchend', () => isDragging = false);
 
-// ✅ 更新罐頭位置
+// ✅ 更新罐頭位置 & 防止邊界卡住
 function moveCan(clientX, clientY) {
     const rect = gameContainer.getBoundingClientRect();
-    let x = clientX - rect.left - can.width / 2;
-    let y = clientY - rect.top - can.height / 2;
-    x = Math.max(0, Math.min(rect.width - can.width, x));
-    y = Math.max(0, Math.min(rect.height - can.height, y));
+    let x = clientX - rect.left - can.offsetWidth / 2;
+    let y = clientY - rect.top - can.offsetHeight / 2;
+
+    // ✅ 讓罐頭可以稍微超出邊界
+    x = Math.max(-20, Math.min(rect.width - can.offsetWidth + 20, x));
+    y = Math.max(-20, Math.min(rect.height - can.offsetHeight + 20, y));
+
     can.style.left = `${x}px`;
     can.style.top = `${y}px`;
-    checkCollision();
+
+    checkCollision(); // ✅ 每次移動時檢查碰撞
 }
 
 // ✅ 檢查罐頭是否餵到貓
@@ -146,7 +152,7 @@ function checkCollision() {
         // 🚀 罐頭立即消失並換新
         can.style.transition = "opacity 0.2s, transform 0.3s";
         can.style.opacity = "0";
-        can.style.transform = "scale(0.8)"; // 稍微縮小
+        can.style.transform = "scale(0.8)"; 
 
         setTimeout(() => {
             message.style.display = 'none';
@@ -154,14 +160,16 @@ function checkCollision() {
             can.style.transform = "scale(1)";
             can.style.top = '20px';
             can.style.left = '50%';
-            replaceCanImmediately(); // ✅ 立即換新罐頭
+            replaceCanImmediately(); 
         }, 300);
     }
 }
 
 // ✅ 防止手機下拉導致網頁刷新
 document.addEventListener("touchmove", function (event) {
-  event.preventDefault();
+    if (isDragging) {
+        event.preventDefault(); // 只在拖曳時阻止滾動
+    }
 }, { passive: false });
 
 // ✅ 遊戲開始時選擇罐頭
