@@ -134,7 +134,7 @@ function checkCollision() {
         score += points;
         counter.innerText = score;
 
-        message.innerText = points > 0 ? "喵！😺" : "😾"; // 壞罐頭讓貓生氣
+        message.innerText = points > 0 ? "meow！😺" : "😾"; // 壞罐頭讓貓生氣
         message.style.display = 'block';
 
         // 🚀 讓罐頭短暫消失，並換新罐頭
