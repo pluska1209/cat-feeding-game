@@ -140,5 +140,10 @@ function checkCollision() {
     }
 }
 
+document.addEventListener("touchmove", function (event) {
+  event.preventDefault();
+}, { passive: false });
+
+
 // ✅ 遊戲開始時隨機選擇罐頭
 randomizeCan();
