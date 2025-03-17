@@ -14,12 +14,12 @@ let score = 0; // 分數
 let timeLeft = 30; // 倒數計時
 let currentCanType = 0; // 當前罐頭類型（0=普通, 1=金色, 2=壞掉）
 
-// 罐頭種類
 const cans = [
-    "https://lh3.googleusercontent.com/d/1r3O4cvBIggQOTzFYtQCaBlJxYwRtoBjT", // 普通罐頭
-    "https://lh3.googleusercontent.com/d/1Fi0VfIh1P-2QkFUEZlFXQKxcYsSTIFBF", // 金色罐頭
-    "https://lh3.googleusercontent.com/d/1Tn66HTQNCQmC8EFVi6poJJcJUrEjlzX_"  // 壞掉的罐頭
+  "https://drive.google.com/uc?export=view&id=1r3O4cvBIggQOTzFYtQCaBlJxYwRtoBjT", // 普通罐頭
+  "https://drive.google.com/uc?export=view&id=1Fi0VfIh1P-2QkFUEZlFXQKxcYsSTIFBF", // 金色罐頭
+  "https://drive.google.com/uc?export=view&id=1Tn66HTQNCQmC8EFVi6poJJcJUrEjlzX_"  // 壞掉的罐頭
 ];
+
 
 // ✅ 隨機更換罐頭
 function randomizeCan() {
