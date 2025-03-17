@@ -15,18 +15,18 @@ let timeLeft = 30;
 let currentCanType = 0;
 
 const cans = [
-    "https://raw.githubusercontent.com/pluska1209/cat-feeding-game/main/catcan.png",  // 普通罐頭
-    "https://raw.githubusercontent.com/pluska1209/cat-feeding-game/main/goldcan.png", // 金色罐頭
-    "https://raw.githubusercontent.com/pluska1209/cat-feeding-game/main/blackcan.png" // 壞掉的罐頭
+    "https://raw.githubusercontent.com/pluska1209/cat-feeding-game/main/catcan.png",
+    "https://raw.githubusercontent.com/pluska1209/cat-feeding-game/main/goldcan.png",
+    "https://raw.githubusercontent.com/pluska1209/cat-feeding-game/main/blackcan.png"
 ];
 
-// ✅ 讓罐頭平滑變換
+// ✅ 讓罐頭立即換新
 function smoothChangeCan() {
     can.style.opacity = "0"; // 先淡出罐頭
     setTimeout(() => {
         randomizeCan(); // 更換罐頭
         can.style.opacity = "1"; // 再淡入罐頭
-    }, 300); // 300ms 讓過渡更順暢
+    }, 300);
 }
 
 // ✅ 隨機更換罐頭
@@ -67,14 +67,14 @@ function endGame() {
     clearInterval(catMoveInterval);
     finalScoreDisplay.innerText = score;
     finalScoreMessage.style.display = 'block';
-    can.style.pointerEvents = "none";
     can.style.opacity = "0.5";
 }
 
 // ✅ 罐頭拖曳邏輯
-can.addEventListener('mousedown', () => {
+can.addEventListener('mousedown', (e) => {
     if (isGameOver) return;
     isDragging = true;
+    moveCan(e.clientX, e.clientY);
 });
 
 document.addEventListener('mousemove', (e) => {
@@ -84,17 +84,19 @@ document.addEventListener('mousemove', (e) => {
 
 document.addEventListener('mouseup', () => isDragging = false);
 
+// ✅ 觸控支援（手機）
 can.addEventListener('touchstart', (e) => {
     if (isGameOver) return;
     isDragging = true;
-    e.preventDefault();
+    moveCan(e.touches[0].clientX, e.touches[0].clientY);
+    e.preventDefault(); // ✅ 這樣能阻止手機滾動
 });
 
 document.addEventListener('touchmove', (e) => {
     if (isGameOver || !isDragging) return;
     let touch = e.touches[0];
     moveCan(touch.clientX, touch.clientY);
-});
+}, { passive: false });
 
 document.addEventListener('touchend', () => isDragging = false);
 
@@ -103,11 +105,15 @@ function moveCan(clientX, clientY) {
     const rect = gameContainer.getBoundingClientRect();
     let x = clientX - rect.left - can.width / 2;
     let y = clientY - rect.top - can.height / 2;
-    x = Math.max(0, Math.min(rect.width - can.width, x));
-    y = Math.max(0, Math.min(rect.height - can.height, y));
+
+    // ✅ 讓罐頭可稍微超出邊界，不會卡住
+    x = Math.max(-20, Math.min(rect.width - can.width + 20, x));
+    y = Math.max(-20, Math.min(rect.height - can.height + 20, y));
+
     can.style.left = `${x}px`;
     can.style.top = `${y}px`;
-    checkCollision();
+
+    checkCollision(); // ✅ 確保碰撞檢測
 }
 
 // ✅ 檢查罐頭是否餵到貓
@@ -131,32 +137,27 @@ function checkCollision() {
         message.innerText = points > 0 ? "喵！😺" : "😾";
         message.style.display = 'block';
 
-        // 🚀 讓罐頭滑順地回到原位
-        can.style.transition = "opacity 0.3s, transform 0.5s";
+        // 🚀 讓罐頭立即消失並換新
+        can.style.transition = "opacity 0.3s, transform 0.3s";
         can.style.opacity = "0";
-        can.style.transform = "translateY(-20px)"; // 往上飄一點
-       
+        can.style.transform = "scale(0.8)";
+
         setTimeout(() => {
             message.style.display = 'none';
-            can.style.transition = "none"; // 關閉 transition，避免影響拖曳
-            can.style.transform = "translateY(0)"; // 回到原本位置
+            can.style.transition = "none";
+            can.style.transform = "scale(1)";
             can.style.top = '20px';
             can.style.left = '50%';
             smoothChangeCan(); // ✅ 流暢地更換新罐頭
-        }, 500);
+        }, 300);
     }
 }
 
-// ✅ 每 5 秒換新罐頭，防止壞罐頭卡住
-setInterval(() => {
-    if (!isGameOver) {
-        smoothChangeCan();
-    }
-}, 5000);
-
-// ✅ 防止手機下拉導致網頁刷新
+// ✅ 防止手機下拉導致網頁刷新，但允許遊戲區域內移動
 document.addEventListener("touchmove", function (event) {
-  event.preventDefault();
+    if (!isDragging) {
+        event.preventDefault(); // ✅ 防止整個頁面滾動
+    }
 }, { passive: false });
 
 // ✅ 遊戲開始時選擇罐頭
