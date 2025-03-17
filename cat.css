@@ -18,7 +18,7 @@ border-radius: 10px;
 overflow: hidden;
 
 /* ✅ 設定背景圖片 */
-background-image: url("https://lh3.googleusercontent.com/d/1lxQby6TdTaSX8xOTk9IZHiWtfUji6NUD");
+background-image: url("https://raw.githubusercontent.com/pluska1209/cat-feeding-game/main/bowl.png");
 background-size: 50%; /* ✅ 讓背景填滿 */
 background-position: center center; /* ✅ 讓背景置中 */
 background-repeat: no-repeat;
