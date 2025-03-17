@@ -70,7 +70,7 @@ function endGame() {
     can.style.opacity = "0.5";
 }
 
-// ✅ 罐頭拖曳邏輯
+// ✅ 罐頭拖曳邏輯（滑鼠）
 can.addEventListener('mousedown', (e) => {
     if (isGameOver) return;
     isDragging = true;
@@ -84,31 +84,32 @@ document.addEventListener('mousemove', (e) => {
 
 document.addEventListener('mouseup', () => isDragging = false);
 
-// ✅ 觸控支援（手機）
+// ✅ **觸控支援（手機）**
 can.addEventListener('touchstart', (e) => {
     if (isGameOver) return;
     isDragging = true;
     moveCan(e.touches[0].clientX, e.touches[0].clientY);
-    e.preventDefault(); // ✅ 這樣能阻止手機滾動
+    e.preventDefault(); // ✅ 防止手機滾動
 });
 
 document.addEventListener('touchmove', (e) => {
     if (isGameOver || !isDragging) return;
     let touch = e.touches[0];
     moveCan(touch.clientX, touch.clientY);
+    e.preventDefault(); // ✅ 確保拖曳正常執行
 }, { passive: false });
 
 document.addEventListener('touchend', () => isDragging = false);
 
-// ✅ 更新罐頭位置
+// ✅ **更新罐頭位置**
 function moveCan(clientX, clientY) {
     const rect = gameContainer.getBoundingClientRect();
-    let x = clientX - rect.left - can.width / 2;
-    let y = clientY - rect.top - can.height / 2;
+    let x = clientX - rect.left - can.offsetWidth / 2;
+    let y = clientY - rect.top - can.offsetHeight / 2;
 
     // ✅ 讓罐頭可稍微超出邊界，不會卡住
-    x = Math.max(-20, Math.min(rect.width - can.width + 20, x));
-    y = Math.max(-20, Math.min(rect.height - can.height + 20, y));
+    x = Math.max(-20, Math.min(rect.width - can.offsetWidth + 20, x));
+    y = Math.max(-20, Math.min(rect.height - can.offsetHeight + 20, y));
 
     can.style.left = `${x}px`;
     can.style.top = `${y}px`;
@@ -116,7 +117,7 @@ function moveCan(clientX, clientY) {
     checkCollision(); // ✅ 確保碰撞檢測
 }
 
-// ✅ 檢查罐頭是否餵到貓
+// ✅ **檢查罐頭是否餵到貓**
 function checkCollision() {
     const canRect = can.getBoundingClientRect();
     const catRect = cat.getBoundingClientRect();
@@ -137,7 +138,7 @@ function checkCollision() {
         message.innerText = points > 0 ? "喵！😺" : "😾";
         message.style.display = 'block';
 
-        // 🚀 讓罐頭立即消失並換新
+        // 🚀 罐頭立即消失並換新
         can.style.transition = "opacity 0.3s, transform 0.3s";
         can.style.opacity = "0";
         can.style.transform = "scale(0.8)";
@@ -153,12 +154,17 @@ function checkCollision() {
     }
 }
 
-// ✅ 防止手機下拉導致網頁刷新，但允許遊戲區域內移動
-document.addEventListener("touchmove", function (event) {
-    if (!isDragging) {
-        event.preventDefault(); // ✅ 防止整個頁面滾動
+// ✅ **防止手機下拉導致網頁刷新，但允許遊戲區域內移動**
+document.addEventListener("touchstart", function (event) {
+    if (!event.target.closest('.game-container')) {
+        event.preventDefault(); // ✅ 只有在遊戲區域外才阻止滾動
     }
 }, { passive: false });
 
-// ✅ 遊戲開始時選擇罐頭
+// ✅ **確保遊戲區域允許拖曳**
+gameContainer.addEventListener("touchmove", function (event) {
+    event.stopPropagation(); // ✅ 允許在遊戲區域內拖曳
+}, { passive: false });
+
+// ✅ **遊戲開始時選擇罐頭**
 randomizeCan();
