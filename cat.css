@@ -1,0 +1,50 @@
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  height: 100vh;
+  background-color: #fce4ec;
+  font-family: Arial, sans-serif;
+font-family: 'Press Start 2P', cursive;
+}
+.game-container {
+  position: relative;
+width: 90vw; /* ✅ 讓遊戲區域隨裝置寬度縮放 */
+max-width: 400px; /* ✅ 限制最大寬度 */
+height: 60vh; /* ✅ 適應不同螢幕高度 */
+max-height: 600px; /* ✅ 限制最大高度 */
+border-radius: 10px;
+overflow: hidden;
+
+/* ✅ 設定背景圖片 */
+background-image: url("https://lh3.googleusercontent.com/d/1lxQby6TdTaSX8xOTk9IZHiWtfUji6NUD");
+background-size: 50%; /* ✅ 讓背景填滿 */
+background-position: center center; /* ✅ 讓背景置中 */
+background-repeat: no-repeat;
+}
+.cat {
+  position: absolute;
+  width: 100px;
+  transition: transform 0.3s ease-in-out;
+}
+.can {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  cursor: grab;
+}
+.message, .timer, .final-score {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 24px;
+  font-weight: bold;
+  color: #ff4081;
+}
+.message { top: 50%; display: none; }
+.timer { top: 10px; }
+.counter { margin-top: 10px; font-size: 20px; font-weight: bold; color: #ff4081; }
+.final-score { top: 60%; display: none; }
