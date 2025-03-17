@@ -165,11 +165,14 @@ function checkCollision() {
     }
 }
 
-// ✅ 防止手機下拉導致網頁刷新
-document.addEventListener("touchmove", function (event) {
-    if (isDragging) {
-        event.preventDefault(); // 只在拖曳時阻止滾動
-    }
+// ✅ **防止手機下拉導致網頁刷新**
+document.addEventListener("touchstart", function(event) {
+    event.preventDefault(); // ✅ 這樣能完全阻止下拉刷新
+}, { passive: false });
+
+// ✅ **確保遊戲區域允許拖曳**
+gameContainer.addEventListener("touchmove", function(event) {
+    event.stopPropagation(); // ✅ 允許在遊戲區域內拖曳
 }, { passive: false });
 
 // ✅ 遊戲開始時選擇罐頭
