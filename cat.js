@@ -13,6 +13,7 @@ let isGameOver = false;
 let score = 0;
 let timeLeft = 30;
 let currentCanType = 0;
+let canTimeout; // ⏳ 用來控制罐頭自動更換的計時器
 
 const cans = [
     "https://raw.githubusercontent.com/pluska1209/cat-feeding-game/main/catcan.png",  // 普通罐頭
@@ -20,13 +21,23 @@ const cans = [
     "https://raw.githubusercontent.com/pluska1209/cat-feeding-game/main/blackcan.png" // 壞掉的罐頭
 ];
 
-// ✅ 讓罐頭平滑變換
-function smoothChangeCan() {
+// ✅ 強制更換罐頭（3 秒後自動換）
+function forceChangeCan() {
+    clearTimeout(canTimeout); // 🔄 清除舊的計時器
+    canTimeout = setTimeout(() => {
+        if (!isGameOver) {
+            replaceCanImmediately(); // ✅ 強制換新罐頭
+        }
+    }, 3000); // 3 秒後換新罐頭
+}
+
+// ✅ 讓罐頭立即換新
+function replaceCanImmediately() {
     can.style.opacity = "0"; // 先淡出罐頭
     setTimeout(() => {
-        randomizeCan(); // 更換罐頭
+        randomizeCan(); // 立刻換新罐頭
         can.style.opacity = "1"; // 再淡入罐頭
-    }, 300); // 300ms 讓過渡更順暢
+    }, 200); // 200ms 過渡動畫
 }
 
 // ✅ 隨機更換罐頭
@@ -34,6 +45,7 @@ function randomizeCan() {
     if (isGameOver) return;
     currentCanType = Math.floor(Math.random() * cans.length);
     can.src = cans[currentCanType];
+    forceChangeCan(); // ✅ 確保罐頭 3 秒內會自動變更
 }
 
 // ✅ 計時器
@@ -131,28 +143,21 @@ function checkCollision() {
         message.innerText = points > 0 ? "喵！😺" : "😾";
         message.style.display = 'block';
 
-        // 🚀 讓罐頭滑順地回到原位
-        can.style.transition = "opacity 0.3s, transform 0.5s";
+        // 🚀 罐頭立即消失並換新
+        can.style.transition = "opacity 0.2s, transform 0.3s";
         can.style.opacity = "0";
-        can.style.transform = "translateY(-20px)"; // 往上飄一點
-       
+        can.style.transform = "scale(0.8)"; // 稍微縮小
+
         setTimeout(() => {
             message.style.display = 'none';
-            can.style.transition = "none"; // 關閉 transition，避免影響拖曳
-            can.style.transform = "translateY(0)"; // 回到原本位置
+            can.style.transition = "none";
+            can.style.transform = "scale(1)";
             can.style.top = '20px';
             can.style.left = '50%';
-            smoothChangeCan(); // ✅ 流暢地更換新罐頭
-        }, 500);
+            replaceCanImmediately(); // ✅ 立即換新罐頭
+        }, 300);
     }
 }
-
-// ✅ 每 5 秒換新罐頭，防止壞罐頭卡住
-setInterval(() => {
-    if (!isGameOver) {
-        smoothChangeCan();
-    }
-}, 5000);
 
 // ✅ 防止手機下拉導致網頁刷新
 document.addEventListener("touchmove", function (event) {
