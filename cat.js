@@ -13,6 +13,7 @@ let isGameOver = false;
 let score = 0;
 let timeLeft = 30;
 let currentCanType = 0;
+let animationFrameId = null; // ✅ 讓拖曳更流暢
 
 const cans = [
     "https://raw.githubusercontent.com/pluska1209/cat-feeding-game/main/catcan.png",
@@ -79,7 +80,8 @@ can.addEventListener('mousedown', (e) => {
 
 document.addEventListener('mousemove', (e) => {
     if (isGameOver || !isDragging) return;
-    moveCan(e.clientX, e.clientY);
+    cancelAnimationFrame(animationFrameId);
+    animationFrameId = requestAnimationFrame(() => moveCan(e.clientX, e.clientY));
 });
 
 document.addEventListener('mouseup', () => isDragging = false);
@@ -95,8 +97,8 @@ can.addEventListener('touchstart', (e) => {
 document.addEventListener('touchmove', (e) => {
     if (isGameOver || !isDragging) return;
     let touch = e.touches[0];
-    moveCan(touch.clientX, touch.clientY);
-    e.preventDefault(); // ✅ 確保拖曳正常執行
+    cancelAnimationFrame(animationFrameId);
+    animationFrameId = requestAnimationFrame(() => moveCan(touch.clientX, touch.clientY));
 }, { passive: false });
 
 document.addEventListener('touchend', () => isDragging = false);
