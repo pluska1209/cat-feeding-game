@@ -15,10 +15,11 @@ let timeLeft = 30; // 倒數計時
 let currentCanType = 0; // 當前罐頭類型（0=普通, 1=金色, 2=壞掉）
 
 const cans = [
-  "https://drive.google.com/uc?export=view&id=1r3O4cvBIggQOTzFYtQCaBlJxYwRtoBjT", // 普通罐頭
-  "https://drive.google.com/uc?export=view&id=1Fi0VfIh1P-2QkFUEZlFXQKxcYsSTIFBF", // 金色罐頭
-  "https://drive.google.com/uc?export=view&id=1Tn66HTQNCQmC8EFVi6poJJcJUrEjlzX_"  // 壞掉的罐頭
+  "https://raw.githubusercontent.com/pluska1209/cat-feeding-game/main/catcan.png",
+  "https://raw.githubusercontent.com/pluska1209/cat-feeding-game/main/goldcan.png",
+  "https://raw.githubusercontent.com/pluska1209/cat-feeding-game/main/blackcan.png"
 ];
+
 
 
 // ✅ 隨機更換罐頭
